@@ -46,7 +46,7 @@ class DomainMenuAccessMenuBlock extends SystemMenuBlock implements ContainerFact
     $tree = $this->menuTree->load($menu_name, $parameters);
     $manipulators = array(
       array('callable' => 'menu.default_tree_manipulators:checkAccess'),
-      array('callable' => 'domain_access.default_tree_manipulators:checkDomain'),
+      array('callable' => 'domain_menu_access.default_tree_manipulators:checkDomain'),
       array('callable' => 'menu.default_tree_manipulators:generateIndexAndSort'),
     );
     $tree = $this->menuTree->transform($tree, $manipulators);

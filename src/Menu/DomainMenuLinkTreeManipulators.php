@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain_access\Menu;
+namespace Drupal\domain_menu_access\Menu;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityManagerInterface;
