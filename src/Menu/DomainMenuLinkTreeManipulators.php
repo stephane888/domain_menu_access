@@ -3,7 +3,7 @@
 namespace Drupal\domain_menu_access\Menu;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\InaccessibleMenuLink;
@@ -20,11 +20,11 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 class DomainMenuLinkTreeManipulators {
 
   /**
-   * The entity manager.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * The domain negotiator.
@@ -43,18 +43,18 @@ class DomainMenuLinkTreeManipulators {
   /**
    * @var array
    */
-  protected static $entityIdsToLoad = array();
+  protected static $entityIdsToLoad = [];
 
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\domain\DomainNegotiator $domain_negotiator
    *   The domain negotiator.
    */
-  public function __construct(EntityManagerInterface $entity_manager, DomainNegotiator $domain_negotiator, LanguageManagerInterface $language_manager) {
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, DomainNegotiator $domain_negotiator, LanguageManagerInterface $language_manager) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->domainNegotiator = $domain_negotiator;
     $this->languageManager = $language_manager;
   }
@@ -91,7 +91,7 @@ class DomainMenuLinkTreeManipulators {
       }
 
       if (isset($tree[$key]->access)) {
-        $tree[$key]->access->addCacheContexts(array('url.site'));
+        $tree[$key]->access->addCacheContexts(['url.site']);
       }
     }
 
@@ -125,7 +125,8 @@ class DomainMenuLinkTreeManipulators {
           $domain_access[] = $reference['target_id'];
         }
 
-        if (!in_array($this->domainNegotiator->getActiveDomain()->getOriginalId(), $domain_access)) {
+        if (!in_array($this->domainNegotiator->getActiveDomain()
+          ->getOriginalId(), $domain_access)) {
           $access_result = AccessResult::forbidden();
         }
       }
@@ -147,7 +148,9 @@ class DomainMenuLinkTreeManipulators {
       return FALSE;
     }
 
-    $all_affiliates = $entity->get(DOMAIN_ACCESS_ALL_FIELD)->first()->getString();
+    $all_affiliates = $entity->get(DOMAIN_ACCESS_ALL_FIELD)
+      ->first()
+      ->getString();
 
     return !empty($all_affiliates);
   }
@@ -162,7 +165,7 @@ class DomainMenuLinkTreeManipulators {
    *   The menu link entity.
    */
   protected function loadMenuLinkContentEntity(MenuLinkInterface $instance) {
-    $storage = $this->entityManager->getStorage('menu_link_content');
+    $storage = $this->entityTypeManager->getStorage('menu_link_content');
     $entity = NULL;
 
     if (!empty($instance->getPluginDefinition()['metadata']['entity_id'])) {
@@ -173,13 +176,13 @@ class DomainMenuLinkTreeManipulators {
       static::$entityIdsToLoad[$entity_id] = $entity_id;
       $entities = $storage->loadMultiple(array_values(static::$entityIdsToLoad));
       $entity = isset($entities[$entity_id]) ? $entities[$entity_id] : NULL;
-      static::$entityIdsToLoad = array();
+      static::$entityIdsToLoad = [];
     }
 
     if (!$entity) {
       // Fallback to the loading by the UUID.
       if ($uuid = $instance->getDerivativeId()) {
-        $loaded_entities = $storage->loadByProperties(array('uuid' => $uuid));
+        $loaded_entities = $storage->loadByProperties(['uuid' => $uuid]);
         $entity = reset($loaded_entities);
       }
     }

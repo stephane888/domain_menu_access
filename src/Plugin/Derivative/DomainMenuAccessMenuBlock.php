@@ -41,7 +41,7 @@ class DomainMenuAccessMenuBlock extends SystemMenuBlock {
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
       $container->get('entity.manager')->getStorage('menu'),
-      $container->get('config.factory')->get('domain_access.settings')
+      $container->get('config.factory')->get('domain_menu_access.settings')
     );
   }
 
@@ -52,13 +52,13 @@ class DomainMenuAccessMenuBlock extends SystemMenuBlock {
     $menu_enabled = $this->config->get('menu_enabled');
 
     foreach ($this->menuStorage->loadMultiple() as $menu => $entity) {
-      if (!empty($menu_enabled[$menu])) {
+      if (in_array($menu, $menu_enabled)) {
         $this->derivatives[$menu] = $base_plugin_definition;
         $this->derivatives[$menu]['admin_label'] = $entity->label();
-        $this->derivatives[$menu]['config_dependencies']['config'] = array($entity->getConfigDependencyName());
+        $this->derivatives[$menu]['config_dependencies']['config'] = [$entity->getConfigDependencyName()];
       }
     }
-    
+
     return $this->derivatives;
   }
 

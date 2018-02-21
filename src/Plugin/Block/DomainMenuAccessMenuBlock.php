@@ -13,7 +13,8 @@ use Drupal\system\Plugin\Block\SystemMenuBlock;
  *   id = "domain_access_menu_block",
  *   admin_label = @Translation("Domain Menu"),
  *   category = @Translation("Domain Menu"),
- *   deriver = "Drupal\domain_menu_access\Plugin\Derivative\DomainMenuAccessMenuBlock"
+ *   deriver =
+ *   "Drupal\domain_menu_access\Plugin\Derivative\DomainMenuAccessMenuBlock"
  * )
  */
 class DomainMenuAccessMenuBlock extends SystemMenuBlock implements ContainerFactoryPluginInterface {
@@ -44,11 +45,11 @@ class DomainMenuAccessMenuBlock extends SystemMenuBlock implements ContainerFact
     }
 
     $tree = $this->menuTree->load($menu_name, $parameters);
-    $manipulators = array(
-      array('callable' => 'menu.default_tree_manipulators:checkAccess'),
-      array('callable' => 'domain_menu_access.default_tree_manipulators:checkDomain'),
-      array('callable' => 'menu.default_tree_manipulators:generateIndexAndSort'),
-    );
+    $manipulators = [
+      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+      ['callable' => 'domain_menu_access.default_tree_manipulators:checkDomain'],
+      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+    ];
     $tree = $this->menuTree->transform($tree, $manipulators);
 
     return $this->menuTree->build($tree);
@@ -64,9 +65,10 @@ class DomainMenuAccessMenuBlock extends SystemMenuBlock implements ContainerFact
    *   Config enabled.
    */
   protected function isDomainRestricted($menu_name) {
-    $config = \Drupal::config('domain_access.settings')->get('menu_enabled');
+    $config = \Drupal::config('domain_menu_access.settings')
+      ->get('menu_enabled');
 
-    return !empty($config[$menu_name]);
+    return in_array($menu_name, $config);
   }
 
   /**
