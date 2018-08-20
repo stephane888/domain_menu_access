@@ -8,6 +8,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\InaccessibleMenuLink;
 use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiator;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 
@@ -125,8 +126,8 @@ class DomainMenuLinkTreeManipulators {
           $domain_access[] = $reference['target_id'];
         }
 
-        if (!in_array($this->domainNegotiator->getActiveDomain()
-          ->getOriginalId(), $domain_access)) {
+        $active_domain = $this->domainNegotiator->getActiveDomain();
+        if (($active_domain instanceof DomainInterface) && !in_array($active_domain->getOriginalId(), $domain_access)) {
           $access_result = AccessResult::forbidden();
         }
       }
