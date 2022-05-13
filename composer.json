@@ -1,7 +1,7 @@
 {
-  "name": "drupal/domain_menu_access",
+  "name": "stephane888/domain_menu_access",
   "description": "Domain-based access control for menu link.",
-  "type": "drupal-module",
+  "type": "drupal-module-custom",
   "license": "GPL-2.0+",
   "homepage": "https://www.drupal.org/project/domain_menu_access",
   "require": {
